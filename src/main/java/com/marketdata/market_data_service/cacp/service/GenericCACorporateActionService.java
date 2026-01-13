@@ -103,7 +103,7 @@ public class GenericCACorporateActionService {
             );
 
         } catch (Exception e) {
-            //log.error("Error in getCorporateAction for {}", caType, e);
+            log.error("Error in getCorporateAction for {}", caType, e);
             return CompletableFuture.completedFuture(
                     ResponseEntity.internalServerError()
                             .body(createErrorResponse(e))

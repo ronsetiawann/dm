@@ -40,7 +40,7 @@ public class CorporateActionFacadeService {
 
     @CacheEvict(value = "corporateActionCache", allEntries = true)
     public void removeCachedData() {
-        //log.info("Clearing all corporate action cache");
+        log.info("Clearing all corporate action cache");
     }
 
     @Async

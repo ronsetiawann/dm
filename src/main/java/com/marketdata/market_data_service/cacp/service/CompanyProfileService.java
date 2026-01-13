@@ -28,7 +28,7 @@ public class CompanyProfileService {
 
     @Cacheable(value = "companyProfiles", key = "'all'")
     public List<CompanyProfileDTO> getAllProfiles() {
-        //log.info("Fetching all company profiles from database");
+        log.info("Fetching all company profiles from database");
         return repository.findAll().stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
@@ -273,7 +273,7 @@ public class CompanyProfileService {
         try {
             return objectMapper.readTree(jsonStr);
         } catch (Exception e) {
-            //log.warn("Failed to parse JSON: {}", jsonStr.substring(0, Math.min(100, jsonStr.length())));
+            log.warn("Failed to parse JSON: {}", jsonStr.substring(0, Math.min(100, jsonStr.length())));
             return null;
         }
     }

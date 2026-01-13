@@ -9,6 +9,7 @@ import com.marketdata.market_data_service.cacp.service.CompanyProfileService;
 import com.marketdata.market_data_service.cacp.service.CorporateActionFacadeService;
 import com.marketdata.market_data_service.cacp.service.FundamentalService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/Data")
 @RequiredArgsConstructor
+@Slf4j
 public class CorporateActionController {
 
     private final CorporateActionFacadeService facadeService;
@@ -262,7 +264,7 @@ public class CorporateActionController {
             }
 
         } catch (Exception e) {
-            ////log.error("Error in getCompanyProfile", e);
+            //log.error("Error in getCompanyProfile", e);
             return createErrorResponse(e.getMessage(), returnMode, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -284,7 +286,7 @@ public class CorporateActionController {
                     .header("Content-Type", contentType)
                     .body(response);
         } catch (Exception e) {
-            ////log.error("Error in getAllCompanyProfiles", e);
+            //log.error("Error in getAllCompanyProfiles", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .header("Content-Type", "application/json")
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -342,7 +344,7 @@ public class CorporateActionController {
             @RequestParam(defaultValue = "0") String isJSONStr
     ) {
         try {
-            //log.info("Getting all fundamental data (English)");
+            log.info("Getting all fundamental data (English)");
 
             List<FundamentalDTO> data = fundamentalService.getAllFundamentalsEnglish();
 
@@ -356,7 +358,7 @@ public class CorporateActionController {
                     .body(response);
 
         } catch (Exception e) {
-            //log.error("Error getting all fundamentals", e);
+            log.error("Error getting all fundamentals", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -413,7 +415,7 @@ public class CorporateActionController {
             @RequestParam(defaultValue = "0") String isJSONStr
     ) {
         try {
-            //log.info("Mengambil semua data fundamental (Indonesian)");
+            log.info("Mengambil semua data fundamental (Indonesian)");
 
             List<FundamentalIndDTO> data = fundamentalService.getAllFundamentalsIndonesian();
 
@@ -427,7 +429,7 @@ public class CorporateActionController {
                     .body(response);
 
         } catch (Exception e) {
-            //log.error("Error mengambil semua data fundamental", e);
+            log.error("Error mengambil semua data fundamental", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -464,7 +466,7 @@ public class CorporateActionController {
                 String[] parts = fundCode.split(":");
 
                 if (parts.length != 3) {
-                    //log.warn("Invalid code format: {}", fundCode);
+                    log.warn("Invalid code format: {}", fundCode);
                     continue;
                 }
 
@@ -513,17 +515,17 @@ public class CorporateActionController {
                     .body(response);
 
         } catch (NumberFormatException e) {
-            //log.error("Invalid number format in code: {}", code, e);
+            log.error("Invalid number format in code: {}", code, e);
             return ResponseEntity.badRequest()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Invalid year or quarter format\"}");
         } catch (JsonProcessingException e) {
-            //log.error("Error serializing to JSON", e);
+            log.error("Error serializing to JSON", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"JSON serialization error\"}");
         } catch (Exception e) {
-            //log.error("Error processing fundamental request", e);
+            log.error("Error processing fundamental request", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -549,7 +551,7 @@ public class CorporateActionController {
                 String[] parts = fundCode.split(":");
 
                 if (parts.length != 3) {
-                    //log.warn("Format kode tidak valid: {}", fundCode);
+                    log.warn("Format kode tidak valid: {}", fundCode);
                     continue;
                 }
 
@@ -598,17 +600,16 @@ public class CorporateActionController {
                     .body(response);
 
         } catch (NumberFormatException e) {
-            //log.error("Format angka tidak valid pada code: {}", code, e);
-            return ResponseEntity.badRequest()
-                    .contentType(MediaType.APPLICATION_JSON)
+            log.error("Format angka tidak valid pada code: {}", code, e);
+            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Format tahun atau kuartal tidak valid\"}");
         } catch (JsonProcessingException e) {
-            //log.error("Error serialisasi ke JSON", e);
+            log.error("Error serialisasi ke JSON", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Error serialisasi JSON\"}");
         } catch (Exception e) {
-            //log.error("Error memproses request fundamental", e);
+            log.error("Error memproses request fundamental", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");

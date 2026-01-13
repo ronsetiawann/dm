@@ -26,7 +26,7 @@ public class FundamentalService {
      */
     @Cacheable(value = "fundamentals-en", key = "#stockId + '-' + #year + '-' + #quarter")
     public FundamentalDTO getFundamentalEnglish(String stockId, int year, int quarter) {
-        //log.debug("Getting fundamental data for {}-{}-{}", stockId, year, quarter);
+        log.debug("Getting fundamental data for {}-{}-{}", stockId, year, quarter);
 
         List<FinancialDataEntity> rawData = repository.findByStockIdAndYearAndQuartal(
                 stockId.toUpperCase(), year, quarter
@@ -43,7 +43,7 @@ public class FundamentalService {
      */
     @Cacheable(value = "fundamentals-id", key = "#stockId + '-' + #year + '-' + #quarter")
     public FundamentalIndDTO getFundamentalIndonesian(String stockId, int year, int quarter) {
-        //log.debug("Getting fundamental data (ID) for {}-{}-{}", stockId, year, quarter);
+        log.debug("Getting fundamental data (ID) for {}-{}-{}", stockId, year, quarter);
         List<FinancialDataEntity> rawData = repository.findByStockIdAndYearAndQuartal(
                 stockId.toUpperCase(), year, quarter
         );
@@ -116,7 +116,7 @@ public class FundamentalService {
      */
     @Cacheable(value = "fundamentals-all-en")
     public List<FundamentalDTO> getAllFundamentalsEnglish() {
-        //log.debug("Getting all fundamental data (English)");
+        log.debug("Getting all fundamental data (English)");
 
         List<FinancialDataEntity> allData = repository.findAllOrderByYearAndQuartalDesc();
 
@@ -144,7 +144,7 @@ public class FundamentalService {
      */
     @Cacheable(value = "fundamentals-all-id")
     public List<FundamentalIndDTO> getAllFundamentalsIndonesian() {
-        //log.debug("Getting all fundamental data (Indonesian)");
+        log.debug("Getting all fundamental data (Indonesian)");
 
         List<FinancialDataEntity> allData = repository.findAllOrderByYearAndQuartalDesc();
 
