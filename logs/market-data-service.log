@@ -1,50 +1,143 @@
-2026-01-13 11:56:22.873 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - Starting MarketDataServiceApplication using Java 21.0.7 with PID 41096 (/Users/ronz/Roni/Cacp/market-data-service/target/classes started by ronz in /Users/ronz/Roni/Cacp/market-data-service)
-2026-01-13 11:56:22.874 [restartedMain] DEBUG c.m.m.MarketDataServiceApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
-2026-01-13 11:56:22.874 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - No active profile set, falling back to 1 default profile: "default"
-2026-01-13 11:56:23.519 [restartedMain] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/autoconfigure/orm/jpa/HibernateJpaConfiguration.class]: Failed to initialize dependency 'dataSourceScriptDatabaseInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'dataSourceScriptDatabaseInitializer' defined in class path resource [org/springframework/boot/autoconfigure/sql/init/DataSourceInitializationConfiguration.class]: Unsatisfied dependency expressed through method 'dataSourceScriptDatabaseInitializer' parameter 0: Error creating bean with name 'dataSource' defined in class path resource [org/springframework/boot/autoconfigure/jdbc/DataSourceConfiguration$Hikari.class]: Failed to instantiate [com.zaxxer.hikari.HikariDataSource]: Factory method 'dataSource' threw exception with message: Failed to determine a suitable driver class
-2026-01-13 11:56:23.529 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
-
-***************************
-APPLICATION FAILED TO START
-***************************
-
-Description:
-
-Failed to configure a DataSource: 'url' attribute is not specified and no embedded datasource could be configured.
-
-Reason: Failed to determine a suitable driver class
-
-
-Action:
-
-Consider the following:
-	If you want an embedded database (H2, HSQL or Derby), please put it on the classpath.
-	If you have database settings to be loaded from a particular profile you may need to activate it (no profiles are currently active).
-
-2026-01-13 11:56:26.237 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - Starting MarketDataServiceApplication using Java 21.0.7 with PID 41096 (/Users/ronz/Roni/Cacp/market-data-service/target/classes started by ronz in /Users/ronz/Roni/Cacp/market-data-service)
-2026-01-13 11:56:26.238 [restartedMain] DEBUG c.m.m.MarketDataServiceApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
-2026-01-13 11:56:26.238 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - No active profile set, falling back to 1 default profile: "default"
-2026-01-13 11:56:26.984 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-01-13 11:56:27.267 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'getAllProfiles' with operations: [Builder[public java.util.List com.marketdata.market_data_service.cacp.service.CompanyProfileService.getAllProfiles()] caches=[companyProfiles] | key=''all'' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='' | unless='' | sync='false']
-2026-01-13 11:56:27.438 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'getWarrant' with operations: [Builder[public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.cacp.service.CorporateActionFacadeService.getWarrant(java.lang.String,java.lang.String,boolean,int,int,java.time.LocalDateTime,java.time.LocalDateTime)] caches=[corporateActionCache] | key=''warrant_' + #code + '_' + #stockID + '_' + #p + '_' + #n + '_' + #startDate + '_' + #endDate' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='' | unless='' | sync='false']
-2026-01-13 11:56:27.440 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'removeCachedData' with operations: [Builder[public void com.marketdata.market_data_service.cacp.service.CorporateActionFacadeService.removeCachedData()] caches=[corporateActionCache] | key='' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='',true,false]
-2026-01-13 11:56:27.492 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'getFundamentalIndonesian' with operations: [Builder[public com.marketdata.market_data_service.cacp.dto.FundamentalIndDTO com.marketdata.market_data_service.cacp.service.FundamentalService.getFundamentalIndonesian(java.lang.String,int,int)] caches=[fundamentals-id] | key='#stockId + '-' + #year + '-' + #quarter' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='' | unless='' | sync='false']
-2026-01-13 11:56:27.493 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'getAllFundamentalsEnglish' with operations: [Builder[public java.util.List com.marketdata.market_data_service.cacp.service.FundamentalService.getAllFundamentalsEnglish()] caches=[fundamentals-all-en] | key='' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='' | unless='' | sync='false']
-2026-01-13 11:56:27.493 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'getAllFundamentalsIndonesian' with operations: [Builder[public java.util.List com.marketdata.market_data_service.cacp.service.FundamentalService.getAllFundamentalsIndonesian()] caches=[fundamentals-all-id] | key='' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='' | unless='' | sync='false']
-2026-01-13 11:56:27.493 [restartedMain] TRACE o.s.c.a.AnnotationCacheOperationSource - Adding cacheable method 'getFundamentalEnglish' with operations: [Builder[public com.marketdata.market_data_service.cacp.dto.FundamentalDTO com.marketdata.market_data_service.cacp.service.FundamentalService.getFundamentalEnglish(java.lang.String,int,int)] caches=[fundamentals-en] | key='#stockId + '-' + #year + '-' + #quarter' | keyGenerator='' | cacheManager='' | cacheResolver='' | condition='' | unless='' | sync='false']
-2026-01-13 11:56:27.563 [restartedMain] WARN  o.s.b.a.o.j.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-01-13 11:56:27.592 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getBonus(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caBonus"}, produces={}, value={"/caBonus"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caBonus"}, produces={}, value={"/caBonus"})]
-2026-01-13 11:56:27.592 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getDividen(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caDvden"}, produces={}, value={"/caDvden"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caDvden"}, produces={}, value={"/caDvden"})]
-2026-01-13 11:56:27.593 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getSplit(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caSplit"}, produces={}, value={"/caSplit"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caSplit"}, produces={}, value={"/caSplit"})]
-2026-01-13 11:56:27.593 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getKonversi(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caCvrse"}, produces={}, value={"/caCvrse"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caCvrse"}, produces={}, value={"/caCvrse"})]
-2026-01-13 11:56:27.594 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getReverse(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caRvrse"}, produces={}, value={"/caRvrse"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caRvrse"}, produces={}, value={"/caRvrse"})]
-2026-01-13 11:56:27.594 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getRight(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caRight"}, produces={}, value={"/caRight"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caRight"}, produces={}, value={"/caRight"})]
-2026-01-13 11:56:27.595 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getRupsResult(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caRupsR"}, produces={}, value={"/caRupsR"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caRupsR"}, produces={}, value={"/caRupsR"})]
-2026-01-13 11:56:27.596 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getWarrant(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caWrant"}, produces={}, value={"/caWrant"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caWrant"}, produces={}, value={"/caWrant"})]
-2026-01-13 11:56:27.597 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public org.springframework.http.ResponseEntity com.marketdata.market_data_service.controller.CorporateActionController.removeCaches(), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/RemoveCACaches"}, produces={}, value={"/RemoveCACaches"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/RemoveCACaches"}, produces={}, value={"/RemoveCACaches"})]
-2026-01-13 11:56:27.598 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getIPO(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caIPO"}, produces={}, value={"/caIPO"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caIPO"}, produces={}, value={"/caIPO"})]
-2026-01-13 11:56:27.598 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getPublicExpose(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caPuExp"}, produces={}, value={"/caPuExp"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caPuExp"}, produces={}, value={"/caPuExp"})]
-2026-01-13 11:56:27.598 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public java.util.concurrent.CompletableFuture com.marketdata.market_data_service.controller.CorporateActionController.getRupsSchedule(java.lang.String,java.lang.String,java.lang.String,int,int,java.time.LocalDateTime,java.time.LocalDateTime), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/caRupsS"}, produces={}, value={"/caRupsS"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/caRupsS"}, produces={}, value={"/caRupsS"})]
-2026-01-13 11:56:27.599 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public org.springframework.http.ResponseEntity com.marketdata.market_data_service.controller.CorporateActionController.getAllCompanyProfiles(java.lang.String), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/cpAll"}, produces={}, value={"/cpAll"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/cpAll"}, produces={}, value={"/cpAll"})]
-2026-01-13 11:56:27.600 [restartedMain] WARN  o.s.w.s.m.m.a.RequestMappingHandlerMapping - Multiple @RequestMapping annotations found on public org.springframework.http.ResponseEntity com.marketdata.market_data_service.controller.CorporateActionController.getCompanyProfile(java.lang.String,java.lang.String,java.lang.String), but only the first will be used: [@org.springframework.web.bind.annotation.GetMapping(consumes={}, headers={}, name="", params={}, path={"/cp"}, produces={}, value={"/cp"}), @org.springframework.web.bind.annotation.PostMapping(consumes={}, headers={}, name="", params={}, path={"/cp"}, produces={}, value={"/cp"})]
-2026-01-13 11:56:27.735 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - Started MarketDataServiceApplication in 1.557 seconds (process running for 6378.488)
+2026-01-14 10:59:02.883 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - Starting MarketDataServiceApplication using Java 21.0.7 with PID 9984 (/Users/ronz/Roni/Cacp/market-data-service/target/classes started by ronz in /Users/ronz/Roni/Cacp/market-data-service)
+2026-01-14 10:59:02.890 [restartedMain] DEBUG c.m.m.MarketDataServiceApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
+2026-01-14 10:59:02.891 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-14 10:59:07.114 [restartedMain] WARN  o.h.e.jdbc.spi.SqlExceptionHelper - SQL Error: 1045, SQLState: 28000
+2026-01-14 10:59:07.117 [restartedMain] ERROR o.h.e.jdbc.spi.SqlExceptionHelper - Access denied for user 'root'@'localhost' (using password: YES)
+2026-01-14 10:59:07.118 [restartedMain] WARN  o.h.e.j.e.i.JdbcEnvironmentInitiator - HHH000342: Could not obtain connection to query metadata
+org.hibernate.exception.GenericJDBCException: unable to obtain isolated JDBC connection [Access denied for user 'root'@'localhost' (using password: YES)] [n/a]
+	at org.hibernate.exception.internal.StandardSQLExceptionConverter.convert(StandardSQLExceptionConverter.java:63)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:108)
+	at org.hibernate.engine.jdbc.spi.SqlExceptionHelper.convert(SqlExceptionHelper.java:94)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:116)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.getJdbcEnvironmentUsingJdbcMetadata(JdbcEnvironmentInitiator.java:334)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:129)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator.initiateService(JdbcEnvironmentInitiator.java:81)
+	at org.hibernate.boot.registry.internal.StandardServiceRegistryImpl.initiateService(StandardServiceRegistryImpl.java:130)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.createService(AbstractServiceRegistryImpl.java:263)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.initializeService(AbstractServiceRegistryImpl.java:238)
+	at org.hibernate.service.internal.AbstractServiceRegistryImpl.getService(AbstractServiceRegistryImpl.java:215)
+	at org.hibernate.boot.model.relational.Database.<init>(Database.java:45)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.getDatabase(InFlightMetadataCollectorImpl.java:226)
+	at org.hibernate.boot.internal.InFlightMetadataCollectorImpl.<init>(InFlightMetadataCollectorImpl.java:194)
+	at org.hibernate.boot.model.process.spi.MetadataBuildingProcess.complete(MetadataBuildingProcess.java:171)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.metadata(EntityManagerFactoryBuilderImpl.java:1442)
+	at org.hibernate.jpa.boot.internal.EntityManagerFactoryBuilderImpl.build(EntityManagerFactoryBuilderImpl.java:1513)
+	at org.springframework.orm.jpa.vendor.SpringHibernateJpaPersistenceProvider.createContainerEntityManagerFactory(SpringHibernateJpaPersistenceProvider.java:66)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.createNativeEntityManagerFactory(LocalContainerEntityManagerFactoryBean.java:390)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.buildNativeEntityManagerFactory(AbstractEntityManagerFactoryBean.java:419)
+	at org.springframework.orm.jpa.AbstractEntityManagerFactoryBean.afterPropertiesSet(AbstractEntityManagerFactoryBean.java:400)
+	at org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean.afterPropertiesSet(LocalContainerEntityManagerFactoryBean.java:366)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.invokeInitMethods(AbstractAutowireCapableBeanFactory.java:1873)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.initializeBean(AbstractAutowireCapableBeanFactory.java:1822)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:607)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:207)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:973)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.marketdata.market_data_service.MarketDataServiceApplication.main(MarketDataServiceApplication.java:12)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: java.sql.SQLException: Access denied for user 'root'@'localhost' (using password: YES)
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:121)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114)
+	at com.mysql.cj.jdbc.ConnectionImpl.createNewIO(ConnectionImpl.java:840)
+	at com.mysql.cj.jdbc.ConnectionImpl.<init>(ConnectionImpl.java:416)
+	at com.mysql.cj.jdbc.ConnectionImpl.getInstance(ConnectionImpl.java:237)
+	at com.mysql.cj.jdbc.NonRegisteringDriver.connect(NonRegisteringDriver.java:180)
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:144)
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:370)
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:207)
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:488)
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:576)
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:97)
+	at com.zaxxer.hikari.HikariDataSource.getConnection(HikariDataSource.java:111)
+	at org.hibernate.engine.jdbc.connections.internal.DatasourceConnectionProviderImpl.getConnection(DatasourceConnectionProviderImpl.java:126)
+	at org.hibernate.engine.jdbc.env.internal.JdbcEnvironmentInitiator$ConnectionProviderJdbcConnectionAccess.obtainConnection(JdbcEnvironmentInitiator.java:485)
+	at org.hibernate.resource.transaction.backend.jdbc.internal.JdbcIsolationDelegate.delegateWork(JdbcIsolationDelegate.java:61)
+	... 38 common frames omitted
+2026-01-14 10:59:07.141 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-14 10:59:08.167 [restartedMain] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newsRepository' defined in file [/Users/ronz/Roni/Cacp/market-data-service/target/classes/com/marketdata/market_data_service/cacp/repository/NewsRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'org.springframework.jdbc.core.JdbcTemplate' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("primaryJdbcTemplate")}
+2026-01-14 10:59:08.869 [restartedMain] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newsRepository' defined in file [/Users/ronz/Roni/Cacp/market-data-service/target/classes/com/marketdata/market_data_service/cacp/repository/NewsRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'org.springframework.jdbc.core.JdbcTemplate' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("primaryJdbcTemplate")}
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:990)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.marketdata.market_data_service.MarketDataServiceApplication.main(MarketDataServiceApplication.java:12)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.jdbc.core.JdbcTemplate' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("primaryJdbcTemplate")}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:2315)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1733)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 24 common frames omitted
+2026-01-14 10:59:51.997 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - Starting MarketDataServiceApplication using Java 21.0.7 with PID 10040 (/Users/ronz/Roni/Cacp/market-data-service/target/classes started by ronz in /Users/ronz/Roni/Cacp/market-data-service)
+2026-01-14 10:59:52.000 [restartedMain] DEBUG c.m.m.MarketDataServiceApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
+2026-01-14 10:59:52.001 [restartedMain] INFO  c.m.m.MarketDataServiceApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-14 10:59:53.527 [restartedMain] WARN  org.hibernate.dialect.Dialect - HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-01-14 10:59:53.530 [restartedMain] WARN  org.hibernate.orm.deprecation - HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-01-14 10:59:54.232 [restartedMain] WARN  o.s.b.w.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newsRepository' defined in file [/Users/ronz/Roni/Cacp/market-data-service/target/classes/com/marketdata/market_data_service/cacp/repository/NewsRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'org.springframework.jdbc.core.JdbcTemplate' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("primaryJdbcTemplate")}
+2026-01-14 10:59:54.720 [restartedMain] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'newsRepository' defined in file [/Users/ronz/Roni/Cacp/market-data-service/target/classes/com/marketdata/market_data_service/cacp/repository/NewsRepository.class]: Unsatisfied dependency expressed through constructor parameter 0: No qualifying bean of type 'org.springframework.jdbc.core.JdbcTemplate' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("primaryJdbcTemplate")}
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:804)
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:240)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1395)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1232)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:990)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:627)
+	at org.springframework.boot.web.servlet.context.ServletWebServerApplicationContext.refresh(ServletWebServerApplicationContext.java:146)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1361)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1350)
+	at com.marketdata.market_data_service.MarketDataServiceApplication.main(MarketDataServiceApplication.java:12)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50)
+Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'org.springframework.jdbc.core.JdbcTemplate' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {@org.springframework.beans.factory.annotation.Qualifier("primaryJdbcTemplate")}
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.raiseNoMatchingBeanFound(DefaultListableBeanFactory.java:2315)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1733)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1653)
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:913)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:791)
+	... 24 common frames omitted

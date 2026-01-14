@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "financial_data", schema = "ticmi_cacp")
+@Table(name = "financial_report", schema = "ticmi_cacp")
 @IdClass(FinancialDataEntity.FinancialDataId.class)
 @Data
 @NoArgsConstructor

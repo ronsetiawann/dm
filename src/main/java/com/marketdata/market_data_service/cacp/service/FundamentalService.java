@@ -6,6 +6,7 @@ import com.marketdata.market_data_service.cacp.entity.FinancialDataEntity;
 import com.marketdata.market_data_service.cacp.repository.FinancialDataRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +22,10 @@ public class FundamentalService {
 
     private final FinancialDataRepository repository;
 
+    @CacheEvict(value = {"fundamentals-en", "fundamentals-id"}, allEntries = true)
+    public void clearAllCaches() {
+        log.info("All fundamental caches cleared");
+    }
     /**
      * Get fundamental data in English format
      */

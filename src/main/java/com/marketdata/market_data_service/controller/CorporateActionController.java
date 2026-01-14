@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.marketdata.market_data_service.cacp.dto.CompanyProfileDTO;
 import com.marketdata.market_data_service.cacp.dto.FundamentalDTO;
 import com.marketdata.market_data_service.cacp.dto.FundamentalIndDTO;
+import com.marketdata.market_data_service.cacp.dto.NewsDTO;
 import com.marketdata.market_data_service.cacp.service.CompanyProfileService;
 import com.marketdata.market_data_service.cacp.service.CorporateActionFacadeService;
 import com.marketdata.market_data_service.cacp.service.FundamentalService;
+import com.marketdata.market_data_service.cacp.service.NewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -36,6 +38,7 @@ public class CorporateActionController {
     private final CompanyProfileService service;
     private final FundamentalService fundamentalService;
     private final ObjectMapper objectMapper;
+    private final NewsService newsService;
 
     private static final Pattern INVALID_STOCK_PATTERN = Pattern.compile("[\\s/|?]");
 
@@ -264,7 +267,7 @@ public class CorporateActionController {
             }
 
         } catch (Exception e) {
-            //log.error("Error in getCompanyProfile", e);
+            log.error("Error in getCompanyProfile: code={}, returnMode={}", code, returnMode, e);
             return createErrorResponse(e.getMessage(), returnMode, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -286,7 +289,7 @@ public class CorporateActionController {
                     .header("Content-Type", contentType)
                     .body(response);
         } catch (Exception e) {
-            //log.error("Error in getAllCompanyProfiles", e);
+            log.error("Error in getAllCompanyProfiles: isJSONStr={}", isJSONStr, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .header("Content-Type", "application/json")
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -312,6 +315,7 @@ public class CorporateActionController {
                         .body(message);
             }
         } catch (Exception e) {
+            log.error("Error creating error response: message={}, returnMode={}, status={}", message, returnMode, status, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("{\"error\":\"Internal Server Error\"}");
         }
@@ -329,6 +333,7 @@ public class CorporateActionController {
     @PostMapping("/fd")
     public ResponseEntity<String> getFundamentalPost(@RequestBody String code) {
         if (code == null || code.trim().isEmpty()) {
+            log.error("Invalid input in getFundamentalPost: code is null or empty");
             return ResponseEntity.badRequest()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Invalid Input\"}");
@@ -344,13 +349,9 @@ public class CorporateActionController {
             @RequestParam(defaultValue = "0") String isJSONStr
     ) {
         try {
-            log.info("Getting all fundamental data (English)");
-
             List<FundamentalDTO> data = fundamentalService.getAllFundamentalsEnglish();
-
             String json = objectMapper.writeValueAsString(data);
             boolean isJSON = "1".equals(isJSONStr);
-
             String response = isJSON ? json : "fd(" + json + ");";
 
             return ResponseEntity.ok()
@@ -358,7 +359,7 @@ public class CorporateActionController {
                     .body(response);
 
         } catch (Exception e) {
-            log.error("Error getting all fundamentals", e);
+            log.error("Error getting all fundamentals: isJSONStr={}", isJSONStr, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -375,20 +376,6 @@ public class CorporateActionController {
     // ============================================
     // INDONESIAN VERSION
     // ============================================
-
-    /**
-     * Get fundamental data by code(s) - Indonesian version
-     * Format: STOCKID:TAHUN:KUARTAL
-     * Multiple codes separated by |
-     * Special cases:
-     * - TAHUN=0: ambil 10 tahun terakhir untuk kuartal tersebut
-     * - KUARTAL=0: ambil semua kuartal (1-4) untuk tahun tersebut
-     * Examples:
-     * - /Data/fd-id?code=AALI:2025:1
-     * - /Data/fd-id?code=AALI:2025:1|BBCA:2024:4
-     * - /Data/fd-id?code=AALI:0:1 (10 tahun terakhir, K1)
-     * - /Data/fd-id?code=AALI:2025:0 (semua kuartal tahun 2025)
-     */
     @GetMapping("/fd-id")
     public ResponseEntity<String> getFundamentalIndonesia(
             @RequestParam(defaultValue = "AALI:2025:1") String code,
@@ -400,6 +387,7 @@ public class CorporateActionController {
     @PostMapping("/fd-id")
     public ResponseEntity<String> getFundamentalIndonesiaPost(@RequestBody String code) {
         if (code == null || code.trim().isEmpty()) {
+            log.error("Invalid input in getFundamentalIndonesiaPost: code is null or empty");
             return ResponseEntity.badRequest()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Input tidak valid\"}");
@@ -415,13 +403,9 @@ public class CorporateActionController {
             @RequestParam(defaultValue = "0") String isJSONStr
     ) {
         try {
-            log.info("Mengambil semua data fundamental (Indonesian)");
-
             List<FundamentalIndDTO> data = fundamentalService.getAllFundamentalsIndonesian();
-
             String json = objectMapper.writeValueAsString(data);
             boolean isJSON = "1".equals(isJSONStr);
-
             String response = isJSON ? json : "fd(" + json + ");";
 
             return ResponseEntity.ok()
@@ -429,7 +413,7 @@ public class CorporateActionController {
                     .body(response);
 
         } catch (Exception e) {
-            log.error("Error mengambil semua data fundamental", e);
+            log.error("Error getting all fundamentals (Indonesian): isJSONStr={}", isJSONStr, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -443,6 +427,40 @@ public class CorporateActionController {
         return getAllFundamentalsIndonesia(isJSONStr);
     }
 
+    // NEWS
+    @GetMapping("/news")
+    @PostMapping("/news")
+    public ResponseEntity<String> getNews(
+            @RequestParam(required = false, defaultValue = "") String stockID,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "25") int n,
+            @RequestParam(required = false, defaultValue = "") String startDate,
+            @RequestParam(required = false, defaultValue = "") String endDate,
+            @RequestParam(required = false, defaultValue = "0") String isJSONStr
+    ) {
+        try {
+            if (n <= 0) n = 25;
+            if (n > 100) n = 100;
+            if (page < 0) page = 0;
+            List<NewsDTO> result = newsService.getFilteredNews(
+                    stockID, startDate, endDate, n, page
+            );
+            String json = objectMapper.writeValueAsString(result);
+            boolean isJSON = "1".equals(isJSONStr);
+            String response = isJSON ? json : "news(" + json + ");";
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+        } catch (Exception e) {
+            log.error("Error fetching news: stockID={}, page={}, n={}, startDate={}, endDate={}",
+                    stockID, page, n, startDate, endDate, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"error\":\"" + e.getMessage() + "\"}");
+        }
+    }
+
     // ============================================
     // PRIVATE HELPER METHODS
     // ============================================
@@ -454,6 +472,7 @@ public class CorporateActionController {
         try {
             // Handle POST case where code might be "POST"
             if ("POST".equalsIgnoreCase(code)) {
+                log.error("Invalid POST input detected in processFundamentalRequestEnglish");
                 return ResponseEntity.badRequest()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"error\":\"Invalid Input\"}");
@@ -466,7 +485,7 @@ public class CorporateActionController {
                 String[] parts = fundCode.split(":");
 
                 if (parts.length != 3) {
-                    log.warn("Invalid code format: {}", fundCode);
+                    log.error("Invalid code format: {}", fundCode);
                     continue;
                 }
 
@@ -475,6 +494,7 @@ public class CorporateActionController {
                 // Validate stockID
                 if (stockID.contains(" ") || stockID.contains("/") ||
                         stockID.contains("|") || stockID.contains("?")) {
+                    log.error("Invalid StockID detected: {}", stockID);
                     return ResponseEntity.badRequest()
                             .contentType(MediaType.APPLICATION_JSON)
                             .body("{\"error\":\"Invalid StockID\"}");
@@ -520,12 +540,12 @@ public class CorporateActionController {
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Invalid year or quarter format\"}");
         } catch (JsonProcessingException e) {
-            log.error("Error serializing to JSON", e);
+            log.error("JSON serialization error for code: {}", code, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"JSON serialization error\"}");
         } catch (Exception e) {
-            log.error("Error processing fundamental request", e);
+            log.error("Error processing fundamental request: code={}, isJSONStr={}", code, isJSONStr, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
@@ -539,6 +559,7 @@ public class CorporateActionController {
         try {
             // Handle POST case where code might be "POST"
             if ("POST".equalsIgnoreCase(code)) {
+                log.error("Invalid POST input detected in processFundamentalRequestIndonesian");
                 return ResponseEntity.badRequest()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body("{\"error\":\"Input tidak valid\"}");
@@ -551,7 +572,7 @@ public class CorporateActionController {
                 String[] parts = fundCode.split(":");
 
                 if (parts.length != 3) {
-                    log.warn("Format kode tidak valid: {}", fundCode);
+                    log.error("Format kode tidak valid: {}", fundCode);
                     continue;
                 }
 
@@ -560,6 +581,7 @@ public class CorporateActionController {
                 // Validate stockID
                 if (stockID.contains(" ") || stockID.contains("/") ||
                         stockID.contains("|") || stockID.contains("?")) {
+                    log.error("StockID tidak valid: {}", stockID);
                     return ResponseEntity.badRequest()
                             .contentType(MediaType.APPLICATION_JSON)
                             .body("{\"error\":\"StockID tidak valid\"}");
@@ -601,19 +623,47 @@ public class CorporateActionController {
 
         } catch (NumberFormatException e) {
             log.error("Format angka tidak valid pada code: {}", code, e);
-            return ResponseEntity.badRequest().contentType(MediaType.APPLICATION_JSON)
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Format tahun atau kuartal tidak valid\"}");
         } catch (JsonProcessingException e) {
-            log.error("Error serialisasi ke JSON", e);
+            log.error("Error serialisasi JSON untuk code: {}", code, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"Error serialisasi JSON\"}");
         } catch (Exception e) {
-            log.error("Error memproses request fundamental", e);
+            log.error("Error memproses request fundamental: code={}, isJSONStr={}", code, isJSONStr, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .contentType(MediaType.APPLICATION_JSON)
                     .body("{\"error\":\"" + e.getMessage() + "\"}");
         }
     }
-}
 
+    @GetMapping("/RemoveCaches")
+    @PostMapping("/RemoveCaches")
+    public ResponseEntity<String> removeAllCaches() {
+        try {
+            try {
+                facadeService.removeCachedData();
+                log.info("Corporate Action caches cleared (11 types)");
+            } catch (Exception e) {log.error("Failed to clear Corporate Action caches", e);}
+            try {
+                fundamentalService.clearAllCaches();
+                log.info("✓ Fundamental caches cleared (English & Indonesian)");
+            } catch (Exception e) {log.error("✗ Failed to clear Fundamental caches", e);}
+            try {
+                newsService.clearCache();
+                log.info("✓ News cache cleared");
+            } catch (Exception e) {log.error("✗ Failed to clear News cache", e);}
+            try {
+                service.clearCache();
+                log.info("✓ Company Profile cache cleared");
+            } catch (Exception e) {log.error("✗ Failed to clear Company Profile cache", e);}
+            return ResponseEntity.ok("Success");
+        } catch (Exception e) {
+            log.error("Error clearing all caches", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
+        }
+    }
+}

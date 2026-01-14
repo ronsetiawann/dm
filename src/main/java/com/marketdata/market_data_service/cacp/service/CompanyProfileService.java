@@ -26,6 +26,10 @@ public class CompanyProfileService {
     private final CompanyProfileRepository repository;
     private final ObjectMapper objectMapper;
 
+    public void clearCache() {
+        log.info("Company profile cache cleared");
+    }
+
     @Cacheable(value = "companyProfiles", key = "'all'")
     public List<CompanyProfileDTO> getAllProfiles() {
         log.info("Fetching all company profiles from database");
