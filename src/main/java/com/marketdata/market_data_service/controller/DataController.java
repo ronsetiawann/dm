@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/Data")
 @RequiredArgsConstructor
 @Slf4j
-public class CorporateActionController {
+public class DataController {
 
     private final CorporateActionFacadeService facadeService;
     private final CompanyProfileService service;
@@ -43,7 +43,6 @@ public class CorporateActionController {
     private static final Pattern INVALID_STOCK_PATTERN = Pattern.compile("[\\s/|?]");
 
     @GetMapping("/caBonus")
-    @PostMapping("/caBonus")
     public CompletableFuture<ResponseEntity<String>> getBonus(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -59,7 +58,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caDvden")
-    @PostMapping("/caDvden")
     public CompletableFuture<ResponseEntity<String>> getDividen(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -75,7 +73,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caSplit")
-    @PostMapping("/caSplit")
     public CompletableFuture<ResponseEntity<String>> getSplit(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -91,7 +88,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caIPO")
-    @PostMapping("/caIPO")
     public CompletableFuture<ResponseEntity<String>> getIPO(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -107,7 +103,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caCvrse")
-    @PostMapping("/caCvrse")
     public CompletableFuture<ResponseEntity<String>> getKonversi(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -123,7 +118,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caPuExp")
-    @PostMapping("/caPuExp")
     public CompletableFuture<ResponseEntity<String>> getPublicExpose(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -139,7 +133,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caRvrse")
-    @PostMapping("/caRvrse")
     public CompletableFuture<ResponseEntity<String>> getReverse(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -155,7 +148,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caRight")
-    @PostMapping("/caRight")
     public CompletableFuture<ResponseEntity<String>> getRight(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -171,7 +163,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caRupsR")
-    @PostMapping("/caRupsR")
     public CompletableFuture<ResponseEntity<String>> getRupsResult(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -187,7 +178,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caRupsS")
-    @PostMapping("/caRupsS")
     public CompletableFuture<ResponseEntity<String>> getRupsSchedule(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -203,7 +193,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/caWrant")
-    @PostMapping("/caWrant")
     public CompletableFuture<ResponseEntity<String>> getWarrant(
             @RequestParam(defaultValue = "") String code,
             @RequestParam(defaultValue = "") String stockID,
@@ -219,7 +208,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/RemoveCACaches")
-    @PostMapping("/RemoveCACaches")
     public ResponseEntity<String> removeCaches() {
         facadeService.removeCachedData();
         return ResponseEntity.ok("Success");
@@ -232,7 +220,6 @@ public class CorporateActionController {
      * - /Data/cp?code=AALI&isJSONStr=1&returnMode=obj
      */
     @GetMapping("/cp")
-    @PostMapping("/cp")
     public ResponseEntity<String> getCompanyProfile(
             @RequestParam(defaultValue = "AALI") String code,
             @RequestParam(defaultValue = "0") String isJSONStr,
@@ -276,7 +263,6 @@ public class CorporateActionController {
      * Get all company profiles
      */
     @GetMapping("/cpAll")
-    @PostMapping("/cpAll")
     public ResponseEntity<String> getAllCompanyProfiles(
             @RequestParam(defaultValue = "1") String isJSONStr) {
         try {
@@ -330,7 +316,6 @@ public class CorporateActionController {
         return processFundamentalRequestEnglish(code, isJSONStr);
     }
 
-    @PostMapping("/fd")
     public ResponseEntity<String> getFundamentalPost(@RequestBody String code) {
         if (code == null || code.trim().isEmpty()) {
             log.error("Invalid input in getFundamentalPost: code is null or empty");
@@ -366,7 +351,6 @@ public class CorporateActionController {
         }
     }
 
-    @PostMapping("/fdAll")
     public ResponseEntity<String> getAllFundamentalsPost(
             @RequestParam(defaultValue = "0") String isJSONStr
     ) {
@@ -384,7 +368,6 @@ public class CorporateActionController {
         return processFundamentalRequestIndonesian(code, isJSONStr);
     }
 
-    @PostMapping("/fd-id")
     public ResponseEntity<String> getFundamentalIndonesiaPost(@RequestBody String code) {
         if (code == null || code.trim().isEmpty()) {
             log.error("Invalid input in getFundamentalIndonesiaPost: code is null or empty");
@@ -420,7 +403,6 @@ public class CorporateActionController {
         }
     }
 
-    @PostMapping("/fdAll-id")
     public ResponseEntity<String> getAllFundamentalsIndonesiaPost(
             @RequestParam(defaultValue = "0") String isJSONStr
     ) {
@@ -429,7 +411,6 @@ public class CorporateActionController {
 
     // NEWS
     @GetMapping("/news")
-    @PostMapping("/news")
     public ResponseEntity<String> getNews(
             @RequestParam(required = false, defaultValue = "") String stockID,
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -640,7 +621,6 @@ public class CorporateActionController {
     }
 
     @GetMapping("/RemoveCaches")
-    @PostMapping("/RemoveCaches")
     public ResponseEntity<String> removeAllCaches() {
         try {
             try {

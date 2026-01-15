@@ -1,32 +1,22 @@
 package com.marketdata.market_data_service.cacp.dto;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 /**
- * English version DTO - Backward compatible with C# API format
- * Fields that are not available in financial_data table will be null
+ * DTO for Fundamental Data (English) - Income Statement + Financial Ratios
+ * Combines data from financial_report and financial_ratio tables
  */
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonAutoDetect(
-        fieldVisibility = JsonAutoDetect.Visibility.NONE,
-        getterVisibility = JsonAutoDetect.Visibility.NONE,
-        setterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE,
-        creatorVisibility = JsonAutoDetect.Visibility.NONE
-)
 public class FundamentalDTO {
 
-    @JsonProperty("StockID")
+    // Basic Info
+    @JsonProperty("StockId")
     private String stockId;
 
     @JsonProperty("Year")
@@ -36,221 +26,179 @@ public class FundamentalDTO {
     private Integer quarter;
 
     @JsonProperty("Date")
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
 
-    @JsonProperty("FiscalYear")
-    private String fiscalYear;
+    // ============================================
+    // INCOME STATEMENT DATA (from financial_report)
+    // ============================================
 
-    @JsonProperty("MonthCover")
-    private Integer monthCover;
-
-    // ===== INCOME STATEMENT (Available in financial_data) =====
+    // Revenue & Profit
+    @JsonProperty("TotalSales")
+    private Double totalSales;
 
     @JsonProperty("GrossProfit")
-    private Double grossProfit;  // labaBruto
-
-    @JsonProperty("NetIncome")
-    private Double netIncome;  // labaRugi
-
-    @JsonProperty("TotalSales")
-    private Double totalSales;  // penjualanDanPendapatanUsaha
+    private Double grossProfit;
 
     @JsonProperty("OperatingProfit")
-    private Double operatingProfit;  // labaOperasional
-
-    @JsonProperty("CostGoodSold")
-    private Double costGoodSold;  // bebanPokokPenjualanDanPendapatan
+    private Double operatingProfit;
 
     @JsonProperty("EarningBeforeTax")
-    private Double earningBeforeTax;  // labaRugiSebelumPajakPenghasilan
+    private Double earningBeforeTax;
 
-    @JsonProperty("Tax")
-    private Double tax;  // pendapatanBebanPajak (negative value)
+    @JsonProperty("NetIncome")
+    private Double netIncome;
 
-    @JsonProperty("OtherIncome")
-    private Double otherIncome;  // pendapatanLainnya
-
-    // ===== EXPENSES =====
+    // Costs & Expenses
+    @JsonProperty("CostGoodSold")
+    private Double costGoodSold;
 
     @JsonProperty("InterestExpense")
-    private Double interestExpense;  // bebanBungaDanKeuangan
+    private Double interestExpense;
 
     @JsonProperty("SalesExpense")
-    private Double salesExpense;  // bebanPenjualan
+    private Double salesExpense;
 
     @JsonProperty("GeneralAdminExpense")
-    private Double generalAdminExpense;  // bebanUmumDanAdministrasi
+    private Double generalAdminExpense;
 
     @JsonProperty("OtherExpense")
-    private Double otherExpense;  // bebanLainnya
+    private Double otherExpense;
 
     @JsonProperty("DepreciationAmortization")
-    private Double depreciationAmortization;  // bebanPenyusutanDanAmortisasi
+    private Double depreciationAmortization;
 
     @JsonProperty("EmployeeBenefits")
-    private Double employeeBenefits;  // bebanManfaatKaryawan
+    private Double employeeBenefits;
 
-    // ===== INCOME =====
+    @JsonProperty("Tax")
+    private Double tax;
 
+    // Income
     @JsonProperty("FinancialIncome")
-    private Double financialIncome;  // pendapatanKeuangan
+    private Double financialIncome;
 
     @JsonProperty("InterestIncome")
-    private Double interestIncome;  // pendapatanBunga
+    private Double interestIncome;
 
     @JsonProperty("DividendIncome")
-    private Double dividendIncome;  // pendapatanDividen
+    private Double dividendIncome;
 
     @JsonProperty("CommissionIncome")
-    private Double commissionIncome;  // pendapatanKomisi
+    private Double commissionIncome;
 
     @JsonProperty("InvestmentIncome")
-    private Double investmentIncome;  // pendapatanInvestasi
+    private Double investmentIncome;
 
-    // ===== COMPREHENSIVE INCOME =====
+    @JsonProperty("OtherIncome")
+    private Double otherIncome;
 
+    // Comprehensive Income
     @JsonProperty("ComprehensiveIncome")
-    private Double comprehensiveIncome;  // labaRugiKomprehensif
+    private Double comprehensiveIncome;
 
     @JsonProperty("OtherComprehensiveIncome")
-    private Double otherComprehensiveIncome;  // pendapatanKomprehensifLainnyaSetelahPajak
+    private Double otherComprehensiveIncome;
 
     @JsonProperty("TaxOnOtherComprehensiveIncome")
-    private Double taxOnOtherComprehensiveIncome;  // pajakAtasPendapatanKomprehensifLainnya
+    private Double taxOnOtherComprehensiveIncome;
 
-    // ===== FOREX & DERIVATIVES =====
-
+    // Forex & Derivatives
     @JsonProperty("ForexGainLoss")
-    private Double forexGainLoss;  // keuntunganKerugianSelisihKursMataUangAsing
+    private Double forexGainLoss;
 
     @JsonProperty("DerivativeGainLoss")
-    private Double derivativeGainLoss;  // keuntunganKerugianAtasInstrumenKeuanganDerivatif
+    private Double derivativeGainLoss;
 
-    // ===== EQUITY METHOD =====
-
+    // Equity Method
     @JsonProperty("ShareOfAssociatesProfit")
-    private Double shareOfAssociatesProfit;  // bagianAtasLabaRugiEntitasAsosiasiYangDicatatDenganMenggunakanMetodeEkuitas
+    private Double shareOfAssociatesProfit;
 
     @JsonProperty("ShareOfJointVenturesProfit")
-    private Double shareOfJointVenturesProfit;  // bagianAtasLabaRugiEntitasVenturaBersamaYangDicatatMenggunakanMetodeEkuitas
+    private Double shareOfJointVenturesProfit;
 
-    // ===== FIELDS NOT AVAILABLE IN financial_data (Legacy compatibility) =====
-    // These will be null as they don't exist in the new data source
+    // ============================================
+    // FINANCIAL RATIOS (from financial_ratio)
+    // ============================================
 
-    @JsonProperty("ParValueA")
-    private Integer parValueA = null;
+    // Profitability Ratios
+    @JsonProperty("GPM")
+    private Double gpm;  // Gross Profit Margin
 
-    @JsonProperty("ParValueB")
-    private Integer parValueB = null;
+    @JsonProperty("OPM")
+    private Double opm;  // Operating Profit Margin
 
-    @JsonProperty("ParValueC")
-    private Integer parValueC = null;
+    @JsonProperty("NPM")
+    private Double npm;  // Net Profit Margin
 
-    @JsonProperty("ParValueD")
-    private Integer parValueD = null;
+    @JsonProperty("ROE")
+    private Double roe;  // Return on Equity
 
-    @JsonProperty("ClosePrice")
-    private Double closePrice = null;
+    @JsonProperty("ROA")
+    private Double roa;  // Return on Assets
 
-    @JsonProperty("Receivables")
-    private Double receivables = null;
+    @JsonProperty("EBITMargin")
+    private Double ebitMargin;
 
-    @JsonProperty("Inventories")
-    private Double inventories = null;
+    // Liquidity Ratios
+    @JsonProperty("CurrentRatio")
+    private Double currentRatio;
 
-    @JsonProperty("CurrentAssets")
-    private Double currentAssets = null;
+    @JsonProperty("QuickRatio")
+    private Double quickRatio;
 
-    @JsonProperty("FixedAssets")
-    private Double fixedAssets = null;
+    @JsonProperty("CashRatio")
+    private Double cashRatio;
 
-    @JsonProperty("OtherAssets")
-    private Double otherAssets = null;
+    // Leverage Ratios
+    @JsonProperty("DAR")
+    private Double dar;  // Debt to Assets Ratio
 
-    @JsonProperty("TotalAssets")
-    private Double totalAssets = null;
+    @JsonProperty("DER")
+    private Double der;  // Debt to Equity Ratio
 
-    @JsonProperty("CurrentLiabilities")
-    private Double currentLiabilities = null;
+    @JsonProperty("LongTermDebtToEquity")
+    private Double longTermDebtToEquity;
 
-    @JsonProperty("LongTermLiabilities")
-    private Double longTermLiabilities = null;
+    @JsonProperty("LiabilitiesToAssets")
+    private Double liabilitiesToAssets;
 
-    @JsonProperty("TotalLiabilities")
-    private Double totalLiabilities = null;
+    @JsonProperty("LiabilitiesToEquity")
+    private Double liabilitiesToEquity;
 
-    @JsonProperty("Authorized")
-    private Double authorized = null;
+    @JsonProperty("FinancialLeverage")
+    private Double financialLeverage;
 
-    @JsonProperty("PaidupCap")
-    private Double paidupCap = null;
+    // Efficiency Ratios
+    @JsonProperty("ATO")
+    private Double ato;  // Asset Turnover
 
-    @JsonProperty("PaidupCapShares")
-    private Double paidupCapShares = null;
+    // Valuation Ratios
+    @JsonProperty("PER")
+    private Double per;  // Price to Earnings Ratio
 
-    @JsonProperty("RetainedEarn")
-    private Double retainedEarn = null;
+    @JsonProperty("PBV")
+    private Double pbv;  // Price to Book Value
 
-    @JsonProperty("TotalEquity")
-    private Double totalEquity = null;
-
-    @JsonProperty("MinInterest")
-    private Double minInterest = null;
-
+    // Per Share Metrics
     @JsonProperty("EPS")
-    private Double eps = null;
+    private Double eps;  // Earnings Per Share
 
-    @JsonProperty("BookValue")
-    private Double bookValue = null;
+    @JsonProperty("BVPS")
+    private Double bvps;  // Book Value Per Share
 
-    @JsonProperty("PriceEarningRatio")
-    private Double priceEarningRatio = null;
+    @JsonProperty("RevenuePerShares")
+    private Double revenuePerShares;
 
-    @JsonProperty("PriceBookValue")
-    private Double priceBookValue = null;
+    @JsonProperty("CashPerShare")
+    private Double cashPerShare;
 
-    @JsonProperty("DebtEquityRatio")
-    private Double debtEquityRatio = null;
+    @JsonProperty("CashflowPerShare")
+    private Double cashflowPerShare;
 
-    @JsonProperty("ROAPercent")
-    private Double roaPercent = null;
+    @JsonProperty("FreeCashflowPerShare")
+    private Double freeCashflowPerShare;
 
-    @JsonProperty("ROEPercent")
-    private Double roePercent = null;
-
-    @JsonProperty("NPMPercent")
-    private Double npmPercent = null;
-
-    @JsonProperty("OPMPercent")
-    private Double opmPercent = null;
-
-    @JsonProperty("CFOperateActs")
-    private Double cfOperateActs = null;
-
-    @JsonProperty("CFInvestActs")
-    private Double cfInvestActs = null;
-
-    @JsonProperty("CFFinActs")
-    private Double cfFinActs = null;
-
-    @JsonProperty("NetIncreaseCashAndCashEquivalent")
-    private Double netIncreaseCashAndCashEquivalent = null;
-
-    @JsonProperty("CashAndCashEquivalentBeginYear")
-    private Double cashAndCashEquivalentBeginYear = null;
-
-    @JsonProperty("CashAndCashEquivalentEndYear")
-    private Double cashAndCashEquivalentEndYear = null;
-
-    @JsonProperty("CashAndCashEquivalent")
-    private Double cashAndCashEquivalent = null;
-
-    @JsonProperty("NonCurrentAssets")
-    private Double nonCurrentAssets = null;
-
-    @JsonProperty("GrossProfitMarginPercent")
-    private Double grossProfitMarginPercent = null;
-
-    @JsonProperty("TotalAssetsTurnover")
-    private Double totalAssetsTurnover = null;
+    @JsonProperty("NetAssetsPerShare")
+    private Double netAssetsPerShare;
 }

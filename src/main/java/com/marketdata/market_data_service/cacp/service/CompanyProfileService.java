@@ -58,8 +58,7 @@ public class CompanyProfileService {
      * Convert Entity to DTO - handles both HTML and JSON formats
      */
     private CompanyProfileDTO toDTO(CompanyProfileEntity entity) {
-        // Parse share_holders to generate info and history
-        JsonNode shareHolder = parseJson(entity.getShareHolders());
+        JsonNode shareHolder = transformShareHolder(entity.getShareHolders());
         JsonNode shareHolderInfo = generateShareHolderInfo(shareHolder);
         JsonNode shareHolderHistory = generateShareHolderHistory(shareHolder);
 
@@ -217,6 +216,43 @@ public class CompanyProfileService {
                 info.put("shares", node.path("shares").asText(""));
                 info.put("sharesPrct", node.path("sharesPrct").asDouble(0) / 100.0);
                 result.add(info);
+            }
+        }
+        return result.size() > 0 ? result : null;
+    }
+
+
+    /**
+     * Transform share holder - convert to consistent format
+     * percentage: 50.37 → sharesPrct: 0.5037 (decimal 0-1)
+     */
+    private JsonNode transformShareHolder(String shareHolderStr) {
+        JsonNode parsed = parseJson(shareHolderStr);
+        if (parsed == null || !parsed.isArray()) return parsed;
+
+        ArrayNode result = objectMapper.createArrayNode();
+
+        for (JsonNode node : parsed) {
+            if (node.isObject()) {
+                ObjectNode obj = objectMapper.createObjectNode();
+                obj.put("text", node.path("text").asText(""));
+                if (node.has("name")) {
+                    obj.put("shareholder", node.path("name").asText(""));
+                } else if (node.has("shareholder")) {
+                    obj.put("shareholder", node.path("shareholder").asText(""));
+                }
+                if (node.has("total")) {
+                    obj.put("shares", String.valueOf(node.path("total").asLong()));
+                } else if (node.has("shares")) {
+                    obj.put("shares", node.path("shares").asText(""));
+                }
+                if (node.has("percentage")) {
+                    double percentage = node.path("percentage").asDouble();
+                    obj.put("percentage", percentage / 100.0);
+                } else if (node.has("sharesPrct")) {
+                    obj.put("sharesPrct", node.path("sharesPrct").asDouble());
+                }
+                result.add(obj);
             }
         }
         return result.size() > 0 ? result : null;

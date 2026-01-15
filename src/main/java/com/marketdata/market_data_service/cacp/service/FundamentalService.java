@@ -3,7 +3,9 @@ package com.marketdata.market_data_service.cacp.service;
 import com.marketdata.market_data_service.cacp.dto.FundamentalDTO;
 import com.marketdata.market_data_service.cacp.dto.FundamentalIndDTO;
 import com.marketdata.market_data_service.cacp.entity.FinancialDataEntity;
+import com.marketdata.market_data_service.cacp.entity.FinancialRatioEntity;
 import com.marketdata.market_data_service.cacp.repository.FinancialDataRepository;
+import com.marketdata.market_data_service.cacp.repository.FinancialRatioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
@@ -15,47 +17,71 @@ import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service for Fundamental Data
+ * Merges data from financial_report and financial_ratio tables
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class FundamentalService {
 
-    private final FinancialDataRepository repository;
+    private final FinancialDataRepository financialDataRepository;
+    private final FinancialRatioRepository financialRatioRepository;
 
-    @CacheEvict(value = {"fundamentals-en", "fundamentals-id"}, allEntries = true)
+    private static final String RATIO_TYPE_QUARTERLY = "quarterly";
+
+    @CacheEvict(value = {"fundamentals-en", "fundamentals-id", "fundamentals-all-en", "fundamentals-all-id"}, allEntries = true)
     public void clearAllCaches() {
         log.info("All fundamental caches cleared");
     }
+
     /**
-     * Get fundamental data in English format
+     * Get fundamental data in English format (Income Statement + Ratios)
      */
     @Cacheable(value = "fundamentals-en", key = "#stockId + '-' + #year + '-' + #quarter")
     public FundamentalDTO getFundamentalEnglish(String stockId, int year, int quarter) {
         log.debug("Getting fundamental data for {}-{}-{}", stockId, year, quarter);
 
-        List<FinancialDataEntity> rawData = repository.findByStockIdAndYearAndQuartal(
-                stockId.toUpperCase(), year, quarter
-        );
+        // 1. Fetch financial_report data (Income Statement)
+        List<FinancialDataEntity> reportData = financialDataRepository
+                .findByStockIdAndYearAndQuartal(stockId.toUpperCase(), year, quarter);
 
-        if (rawData.isEmpty()) {
+        // 2. Fetch financial_ratio data (quarterly ratios)
+        List<FinancialRatioEntity> ratioData = financialRatioRepository
+                .findByStockIdAndYearAndQuartalAndRatioType(
+                        stockId.toUpperCase(), year, quarter, RATIO_TYPE_QUARTERLY
+                );
+
+        if (reportData.isEmpty() && ratioData.isEmpty()) {
             return null;
         }
-        return mapToEnglishDTO(rawData, stockId.toUpperCase(), year, quarter);
+
+        return mapToEnglishDTO(reportData, ratioData, stockId.toUpperCase(), year, quarter);
     }
 
     /**
-     * Get fundamental data in Indonesian format
+     * Get fundamental data in Indonesian format (Laporan Laba Rugi + Rasio)
      */
     @Cacheable(value = "fundamentals-id", key = "#stockId + '-' + #year + '-' + #quarter")
     public FundamentalIndDTO getFundamentalIndonesian(String stockId, int year, int quarter) {
         log.debug("Getting fundamental data (ID) for {}-{}-{}", stockId, year, quarter);
-        List<FinancialDataEntity> rawData = repository.findByStockIdAndYearAndQuartal(
-                stockId.toUpperCase(), year, quarter
-        );
-        if (rawData.isEmpty()) {
+
+        // 1. Fetch financial_report data
+        List<FinancialDataEntity> reportData = financialDataRepository
+                .findByStockIdAndYearAndQuartal(stockId.toUpperCase(), year, quarter);
+
+        // 2. Fetch financial_ratio data
+        List<FinancialRatioEntity> ratioData = financialRatioRepository
+                .findByStockIdAndYearAndQuartalAndRatioType(
+                        stockId.toUpperCase(), year, quarter, RATIO_TYPE_QUARTERLY
+                );
+
+        if (reportData.isEmpty() && ratioData.isEmpty()) {
             return null;
         }
-        return mapToIndonesianDTO(rawData, stockId.toUpperCase(), year, quarter);
+
+        return mapToIndonesianDTO(reportData, ratioData, stockId.toUpperCase(), year, quarter);
     }
 
     /**
@@ -88,6 +114,7 @@ public class FundamentalService {
 
         return results;
     }
+
     /**
      * Get all quarters for a year (when quarter = 0)
      */
@@ -123,22 +150,47 @@ public class FundamentalService {
     public List<FundamentalDTO> getAllFundamentalsEnglish() {
         log.debug("Getting all fundamental data (English)");
 
-        List<FinancialDataEntity> allData = repository.findAllOrderByYearAndQuartalDesc();
+        // 1. Fetch all report data
+        List<FinancialDataEntity> allReportData = financialDataRepository.findAllOrderByYearAndQuartalDesc();
 
-        // Group by stock_id + year + quarter
-        Map<String, List<FinancialDataEntity>> grouped = allData.stream()
+        // 2. Fetch all ratio data
+        List<FinancialRatioEntity> allRatioData = financialRatioRepository
+                .findAllByRatioTypeOrderByYearAndQuartalDesc(RATIO_TYPE_QUARTERLY);
+
+        // 3. Group report data by stock_id + year + quarter
+        Map<String, List<FinancialDataEntity>> reportGrouped = allReportData.stream()
                 .collect(Collectors.groupingBy(
                         entity -> entity.getStockId() + "-" + entity.getYear() + "-" + entity.getQuartal()
                 ));
 
-        return grouped.entrySet().stream()
-                .map(entry -> {
-                    List<FinancialDataEntity> entities = entry.getValue();
-                    if (!entities.isEmpty()) {
-                        FinancialDataEntity first = entities.get(0);
-                        return mapToEnglishDTO(entities, first.getStockId(), first.getYear(), first.getQuartal());
+        // 4. Group ratio data by stock_id + year + quarter
+        Map<String, List<FinancialRatioEntity>> ratioGrouped = allRatioData.stream()
+                .collect(Collectors.groupingBy(
+                        entity -> entity.getStockId() + "-" + entity.getYear() + "-" + entity.getQuartal()
+                ));
+
+        // 5. Merge and map
+        Set<String> allKeys = new HashSet<>();
+        allKeys.addAll(reportGrouped.keySet());
+        allKeys.addAll(ratioGrouped.keySet());
+
+        return allKeys.stream()
+                .map(key -> {
+                    String[] parts = key.split("-");
+                    if (parts.length != 3) return null;
+
+                    String stockId = parts[0];
+                    int year = Integer.parseInt(parts[1]);
+                    int quarter = Integer.parseInt(parts[2]);
+
+                    List<FinancialDataEntity> reportEntities = reportGrouped.getOrDefault(key, Collections.emptyList());
+                    List<FinancialRatioEntity> ratioEntities = ratioGrouped.getOrDefault(key, Collections.emptyList());
+
+                    if (reportEntities.isEmpty() && ratioEntities.isEmpty()) {
+                        return null;
                     }
-                    return null;
+
+                    return mapToEnglishDTO(reportEntities, ratioEntities, stockId, year, quarter);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -151,22 +203,47 @@ public class FundamentalService {
     public List<FundamentalIndDTO> getAllFundamentalsIndonesian() {
         log.debug("Getting all fundamental data (Indonesian)");
 
-        List<FinancialDataEntity> allData = repository.findAllOrderByYearAndQuartalDesc();
+        // 1. Fetch all report data
+        List<FinancialDataEntity> allReportData = financialDataRepository.findAllOrderByYearAndQuartalDesc();
 
-        // Group by stock_id + year + quarter
-        Map<String, List<FinancialDataEntity>> grouped = allData.stream()
+        // 2. Fetch all ratio data
+        List<FinancialRatioEntity> allRatioData = financialRatioRepository
+                .findAllByRatioTypeOrderByYearAndQuartalDesc(RATIO_TYPE_QUARTERLY);
+
+        // 3. Group report data
+        Map<String, List<FinancialDataEntity>> reportGrouped = allReportData.stream()
                 .collect(Collectors.groupingBy(
                         entity -> entity.getStockId() + "-" + entity.getYear() + "-" + entity.getQuartal()
                 ));
 
-        return grouped.entrySet().stream()
-                .map(entry -> {
-                    List<FinancialDataEntity> entities = entry.getValue();
-                    if (!entities.isEmpty()) {
-                        FinancialDataEntity first = entities.get(0);
-                        return mapToIndonesianDTO(entities, first.getStockId(), first.getYear(), first.getQuartal());
+        // 4. Group ratio data
+        Map<String, List<FinancialRatioEntity>> ratioGrouped = allRatioData.stream()
+                .collect(Collectors.groupingBy(
+                        entity -> entity.getStockId() + "-" + entity.getYear() + "-" + entity.getQuartal()
+                ));
+
+        // 5. Merge and map
+        Set<String> allKeys = new HashSet<>();
+        allKeys.addAll(reportGrouped.keySet());
+        allKeys.addAll(ratioGrouped.keySet());
+
+        return allKeys.stream()
+                .map(key -> {
+                    String[] parts = key.split("-");
+                    if (parts.length != 3) return null;
+
+                    String stockId = parts[0];
+                    int year = Integer.parseInt(parts[1]);
+                    int quarter = Integer.parseInt(parts[2]);
+
+                    List<FinancialDataEntity> reportEntities = reportGrouped.getOrDefault(key, Collections.emptyList());
+                    List<FinancialRatioEntity> ratioEntities = ratioGrouped.getOrDefault(key, Collections.emptyList());
+
+                    if (reportEntities.isEmpty() && ratioEntities.isEmpty()) {
+                        return null;
                     }
-                    return null;
+
+                    return mapToIndonesianDTO(reportEntities, ratioEntities, stockId, year, quarter);
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
@@ -185,10 +262,29 @@ public class FundamentalService {
     }
 
     /**
-     * Map to English DTO
+     * Pivot ratio data to Map<ratio_name, value>
      */
-    private FundamentalDTO mapToEnglishDTO(List<FinancialDataEntity> entities, String stockId, int year, int quarter) {
-        Map<String, Double> fieldMap = pivotEAVToMap(entities);
+    private Map<String, Double> pivotRatiosToMap(List<FinancialRatioEntity> entities) {
+        return entities.stream()
+                .collect(Collectors.toMap(
+                        FinancialRatioEntity::getRatioName,
+                        entity -> entity.getValue() != null ? entity.getValue().doubleValue() : null,
+                        (v1, v2) -> v1 // In case of duplicates, keep first
+                ));
+    }
+
+    /**
+     * Map to English DTO (Income Statement + Ratios)
+     */
+    private FundamentalDTO mapToEnglishDTO(
+            List<FinancialDataEntity> reportEntities,
+            List<FinancialRatioEntity> ratioEntities,
+            String stockId,
+            int year,
+            int quarter) {
+
+        Map<String, Double> fieldMap = pivotEAVToMap(reportEntities);
+        Map<String, Double> ratioMap = pivotRatiosToMap(ratioEntities);
 
         FundamentalDTO dto = new FundamentalDTO();
         dto.setStockId(stockId);
@@ -196,7 +292,9 @@ public class FundamentalService {
         dto.setQuarter(quarter);
         dto.setDate(LocalDate.of(year, quarter * 3, 1)); // Approximate date
 
-        // Map Indonesian field names to English properties
+        // ============================================
+        // Income Statement Fields
+        // ============================================
         dto.setGrossProfit(fieldMap.get("labaBruto"));
         dto.setNetIncome(fieldMap.get("labaRugi"));
         dto.setTotalSales(fieldMap.get("penjualanDanPendapatanUsaha"));
@@ -234,14 +332,55 @@ public class FundamentalService {
         dto.setShareOfAssociatesProfit(fieldMap.get("bagianAtasLabaRugiEntitasAsosiasiYangDicatatDenganMenggunakanMetodeEkuitas"));
         dto.setShareOfJointVenturesProfit(fieldMap.get("bagianAtasLabaRugiEntitasVenturaBersamaYangDicatatMenggunakanMetodeEkuitas"));
 
+        // ============================================
+        // Financial Ratios
+        // ============================================
+        dto.setGpm(ratioMap.get("GPM"));
+        dto.setOpm(ratioMap.get("OPM"));
+        dto.setNpm(ratioMap.get("NPM"));
+        dto.setRoe(ratioMap.get("ROE"));
+        dto.setRoa(ratioMap.get("ROA"));
+        dto.setEbitMargin(ratioMap.get("ebitMargin"));
+
+        dto.setCurrentRatio(ratioMap.get("currentRatio"));
+        dto.setQuickRatio(ratioMap.get("quickRatio"));
+        dto.setCashRatio(ratioMap.get("cashRatio"));
+
+        dto.setDar(ratioMap.get("DAR"));
+        dto.setDer(ratioMap.get("DER"));
+        dto.setLongTermDebtToEquity(ratioMap.get("longTermDebtToEquity"));
+        dto.setLiabilitiesToAssets(ratioMap.get("liabilitiesToAssets"));
+        dto.setLiabilitiesToEquity(ratioMap.get("liabilitiesToEquity"));
+        dto.setFinancialLeverage(ratioMap.get("financialLeverage"));
+
+        dto.setAto(ratioMap.get("ATO"));
+
+        dto.setPer(ratioMap.get("PER"));
+        dto.setPbv(ratioMap.get("PBV"));
+
+        dto.setEps(ratioMap.get("eps"));
+        dto.setBvps(ratioMap.get("BVPS"));
+        dto.setRevenuePerShares(ratioMap.get("revenuePerShares"));
+        dto.setCashPerShare(ratioMap.get("cashPerShare"));
+        dto.setCashflowPerShare(ratioMap.get("cashflowPerShare"));
+        dto.setFreeCashflowPerShare(ratioMap.get("freeCashflowPerShare"));
+        dto.setNetAssetsPerShare(ratioMap.get("netAssetsPerShare"));
+
         return dto;
     }
 
     /**
-     * Map to Indonesian DTO
+     * Map to Indonesian DTO (Laporan Laba Rugi + Rasio)
      */
-    private FundamentalIndDTO mapToIndonesianDTO(List<FinancialDataEntity> entities, String stockId, int year, int quarter) {
-        Map<String, Double> fieldMap = pivotEAVToMap(entities);
+    private FundamentalIndDTO mapToIndonesianDTO(
+            List<FinancialDataEntity> reportEntities,
+            List<FinancialRatioEntity> ratioEntities,
+            String stockId,
+            int year,
+            int quarter) {
+
+        Map<String, Double> fieldMap = pivotEAVToMap(reportEntities);
+        Map<String, Double> ratioMap = pivotRatiosToMap(ratioEntities);
 
         FundamentalIndDTO dto = new FundamentalIndDTO();
         dto.setStockId(stockId);
@@ -249,7 +388,9 @@ public class FundamentalService {
         dto.setKuartal(quarter);
         dto.setTanggal(LocalDate.of(year, quarter * 3, 1));
 
-        // Direct mapping - field names sama dengan database
+        // ============================================
+        // Income Statement Fields (kept same as before)
+        // ============================================
         dto.setLabaBruto(fieldMap.get("labaBruto"));
         dto.setLabaRugi(fieldMap.get("labaRugi"));
         dto.setPenjualanDanPendapatanUsaha(fieldMap.get("penjualanDanPendapatanUsaha"));
@@ -349,6 +490,40 @@ public class FundamentalService {
         dto.setLabaRugiKomprehensifYangDapatDiatribusikanAbstrak(fieldMap.get("labaRugiKomprehensifYangDapatDiatribusikanAbstrak"));
         dto.setPendapatanKomprehensifLainnyaSebelumPajakAbstrak(fieldMap.get("pendapatanKomprehensifLainnyaSebelumPajakAbstrak"));
         dto.setPendapatanKomprehensifLainnyaSetelahPajakAbstrak(fieldMap.get("pendapatanKomprehensifLainnyaSetelahPajakAbstrak"));
+
+        // ============================================
+        // Financial Ratios
+        // ============================================
+        dto.setGpm(ratioMap.get("GPM"));
+        dto.setOpm(ratioMap.get("OPM"));
+        dto.setNpm(ratioMap.get("NPM"));
+        dto.setRoe(ratioMap.get("ROE"));
+        dto.setRoa(ratioMap.get("ROA"));
+        dto.setEbitMargin(ratioMap.get("ebitMargin"));
+
+        dto.setCurrentRatio(ratioMap.get("currentRatio"));
+        dto.setQuickRatio(ratioMap.get("quickRatio"));
+        dto.setCashRatio(ratioMap.get("cashRatio"));
+
+        dto.setDar(ratioMap.get("DAR"));
+        dto.setDer(ratioMap.get("DER"));
+        dto.setLongTermDebtToEquity(ratioMap.get("longTermDebtToEquity"));
+        dto.setLiabilitiesToAssets(ratioMap.get("liabilitiesToAssets"));
+        dto.setLiabilitiesToEquity(ratioMap.get("liabilitiesToEquity"));
+        dto.setFinancialLeverage(ratioMap.get("financialLeverage"));
+
+        dto.setAto(ratioMap.get("ATO"));
+
+        dto.setPer(ratioMap.get("PER"));
+        dto.setPbv(ratioMap.get("PBV"));
+
+        dto.setEps(ratioMap.get("eps"));
+        dto.setBvps(ratioMap.get("BVPS"));
+        dto.setRevenuePerShares(ratioMap.get("revenuePerShares"));
+        dto.setCashPerShare(ratioMap.get("cashPerShare"));
+        dto.setCashflowPerShare(ratioMap.get("cashflowPerShare"));
+        dto.setFreeCashflowPerShare(ratioMap.get("freeCashflowPerShare"));
+        dto.setNetAssetsPerShare(ratioMap.get("netAssetsPerShare"));
 
         return dto;
     }

@@ -36,8 +36,11 @@ public class FinancialDataEntity {
     @Column(name = "value", precision = 30, scale = 8)
     private BigDecimal value;
 
-    @Column(name = "updated_at")
+    @Column(name = "ticmi_updated_at")
     private LocalDateTime updatedAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAtDb;
 
     // Composite Key Class
     @Data
